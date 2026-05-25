@@ -13,34 +13,21 @@ class AuthWrapper extends StatefulWidget {
 }
 
 class _AuthWrapperState extends State<AuthWrapper> {
-  bool _isInitialized = false;
-
   @override
   void initState() {
     super.initState();
-    // Wait for auth provider to initialize
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        setState(() {
-          _isInitialized = true;
-        });
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        // Only show loading during actual login/logout operations
-        // NOT during initial check
-        // if (authProvider.isLoading && _isInitialized) {
-        //   return const Scaffold(
-        //     body: Center(
-        //       child: CircularProgressIndicator(),
-        //     ),
-        //   );
-        // }
+        // While the provider is performing the initial auth check, show a loader
+        if (!authProvider.isInitialized) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
         // If logged in, go to dashboard
         if (authProvider.isAuthenticated) {

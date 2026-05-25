@@ -155,13 +155,13 @@ class PaymentDetailsDialog extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
-                                  "Transaction #$serialNo",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white.withOpacity(0.8),
-                                  ),
-                                ),
+                                // Text(
+                                //   "Transaction #$serialNo",
+                                //   style: TextStyle(
+                                //     fontSize: 12,
+                                //     color: Colors.white.withOpacity(0.8),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),

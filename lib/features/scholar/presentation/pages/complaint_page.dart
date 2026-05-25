@@ -361,7 +361,7 @@ class _ComplaintPageState extends State<ComplaintPage>
               'Complaints',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.5,
               ),
@@ -647,7 +647,7 @@ class _ComplaintPageState extends State<ComplaintPage>
             ),
             const SizedBox(height: 8),
             Text(
-              'Tap the + button to create a complaint',
+              'Tap the + button to register your complaint',
               style: TextStyle(
                 color: isDarkMode
                     ? const Color(0xFF94A3B8)
@@ -822,7 +822,7 @@ class _ComplaintPageState extends State<ComplaintPage>
                       color: const Color(0xFF6366F1),
                       onTap: () => _showViewModalDialog(complaint),
                     ),
-                    const SizedBox(width: 8),
+                    // const SizedBox(width: 8),
 
                     // Reply Button (if has reply)
                     if (hasReply)

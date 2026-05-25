@@ -981,7 +981,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                 SizedBox(
                   width: 85,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
@@ -1024,13 +1024,24 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage>
                 ),
 
                 const SizedBox(width: 8),
-
-                // Chevron Icon
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  size: 20,
-                  color: Color(0xFF6C63FF),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF6C63FF).withOpacity(0.09),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.chevron_right_rounded,
+                    color: Color(0xFF6C63FF),
+                    size: 20,
+                  ),
                 ),
+                // Chevron Icon
+                // const Icon(
+                //   Icons.chevron_right_rounded,
+                //   size: 20,
+                //   color: Color(0xFF6C63FF),
+                // ),
               ],
             ),
           ),

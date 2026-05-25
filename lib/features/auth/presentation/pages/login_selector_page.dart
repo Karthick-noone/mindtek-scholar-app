@@ -451,43 +451,33 @@ class _LogoRow extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [_kAccent, _kAccentLight],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: _kAccent.withOpacity(0.35),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: (logoUrl != null && logoUrl.isNotEmpty)
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(
-                    imageUrl: logoUrl,
-                    fit: BoxFit.contain,
-                    placeholder: (_, __) => const Icon(Icons.school_rounded, color: Colors.white, size: 24),
-                    errorWidget: (_, __, ___) => const Icon(Icons.school_rounded, color: Colors.white, size: 24),
-                  ),
-                )
-              : const Icon(Icons.school_rounded, color: Colors.white, size: 24),
-        ),
-        const SizedBox(width: 12),
-        Image.asset(
-          "assets/images/mindtek-logo.png",
-          height: 32,
+     children: [
+  Container(
+    width: 42,
+    height: 42,
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [_kAccent, _kAccentLight],
+      ),
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: _kAccent.withOpacity(0.35),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
         ),
       ],
+    ),
+    child: const Icon(Icons.school_rounded, color: Colors.white, size: 24), // Always show icon, not logo image
+  ),
+  const SizedBox(width: 12),
+  Image.asset(
+    "assets/images/mindtek-logo.png",
+    height: 32,
+  ),
+],
     );
   }
 }

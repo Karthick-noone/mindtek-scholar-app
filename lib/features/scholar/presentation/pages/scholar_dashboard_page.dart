@@ -14,6 +14,7 @@ import 'package:mindtek_scholar_app/providers/complaint_provider.dart';
 import 'package:mindtek_scholar_app/providers/scholar_provider.dart';
 import 'package:mindtek_scholar_app/providers/work_progress_provider.dart';
 import 'package:mindtek_scholar_app/core/network/api_client.dart';
+import 'full_image_view.dart';
 
 // Light Mode Colors
 const _kNavy = Color(0xFF1A2B4A);
@@ -307,12 +308,13 @@ class _DashboardPageState extends State<DashboardPage> {
     ];
     final page = pages[i];
     if (page != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => page),
-      ).then((_) => _loadDashboardData());
+      Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      // ).then((_) => _loadDashboardData());
     }
   }
+  // ── Drop-in replacement for the build() method body inside DashboardPage ──
+  // Only the Expanded content area shows the loader.
+  // Header and _FixedBottomNav are always rendered.
 
   @override
   Widget build(BuildContext context) {
@@ -342,23 +344,60 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return Scaffold(
       backgroundColor: isDarkMode ? _kDarkBg : _kBg,
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: _klightBlue))
-          : Stack(
-              children: [
-                Column(
-                  children: [
-                    _Header(
-                      name: name,
-                      scholarId: scholarId,
-                      photoUrl: photoUrl,
-                      logoUrl: logoUrl,
-                      timeOfDay: _timeOfDay(),
-                      // onAvatarTap: _showProfileMenu,
-                      isDarkMode: isDarkMode,
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              // ── Header — always visible ──────────────────────────────
+              _Header(
+                name: name,
+                scholarId: scholarId,
+                photoUrl: photoUrl,
+                logoUrl: logoUrl,
+                timeOfDay: _timeOfDay(),
+                onAvatarTap: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      transitionDuration: const Duration(milliseconds: 500),
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return FullImageView(
+                          imageUrl: photoUrl.isNotEmpty ? photoUrl : null,
+                          // heroTag: 'profile_image',
+                        );
+                      },
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                            const begin = Offset(0.0, 0.0);
+                            const end = Offset.zero;
+                            const curve = Curves.easeInOutCubic;
+                            var tween = Tween(
+                              begin: begin,
+                              end: end,
+                            ).chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
+
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              ),
+                            );
+                          },
                     ),
-                    Expanded(
-                      child: RefreshIndicator(
+                  );
+                },
+                isDarkMode: isDarkMode,
+              ),
+
+              // ── Content area — loader lives here only ────────────────
+              Expanded(
+                child: _isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(color: _klightBlue),
+                      )
+                    : RefreshIndicator(
                         color: _klightBlue,
                         onRefresh: _loadDashboardData,
                         child: SingleChildScrollView(
@@ -390,16 +429,16 @@ class _DashboardPageState extends State<DashboardPage> {
                                 children: [
                                   _ModernStatCard(
                                     icon: Icons.hourglass_top_rounded,
-                                    iconColor: _kRed,
-                                    iconBg: const Color(0xFFFFF1F1),
+                                    iconColor: _kAmber,
+                                    iconBg: const Color(0xFFFFFBEB),
                                     label: 'Pending Complaints',
                                     value: cp.pendingCount.toString(),
                                     subtitle: 'Awaiting action',
                                     date: _lastComplaintDate(),
                                     gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFEF4444),
-                                        Color(0xFFDC2626),
+                                       colors: [
+                                        Color(0xFFF59E0B),
+                                        Color(0xFFD97706),
                                       ],
                                     ),
                                   ),
@@ -420,16 +459,17 @@ class _DashboardPageState extends State<DashboardPage> {
                                   ),
                                   _ModernStatCard(
                                     icon: Icons.credit_card_rounded,
-                                    iconColor: _kAmber,
-                                    iconBg: const Color(0xFFFFFBEB),
+                                    iconColor: _kRed,
+                                    iconBg: const Color(0xFFFFF1F1),
                                     label: 'Balance Payment',
                                     value: '₹${fmt.format(balance)}',
                                     subtitle: 'Amount due',
                                     date: _lastPaymentDate(),
                                     gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFF59E0B),
-                                        Color(0xFFD97706),
+                                 
+                                       colors: [
+                                        Color(0xFFEF4444),
+                                        Color(0xFFDC2626),
                                       ],
                                     ),
                                   ),
@@ -487,24 +527,22 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+              ),
+            ],
+          ),
 
-                _FixedBottomNav(
-                  selectedIndex: _selectedIndex,
-                  onTap: _onNavTap,
-                  isDarkMode: isDarkMode,
-                ),
-              ],
-            ),
+          // ── Bottom nav — always visible ──────────────────────────────
+          _FixedBottomNav(
+            selectedIndex: _selectedIndex,
+            onTap: _onNavTap,
+            isDarkMode: isDarkMode,
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// FIXED BOTTOM NAV - With Dark Mode Support
-// ═══════════════════════════════════════════════════════════════════════════
 class _FixedBottomNav extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
@@ -617,7 +655,9 @@ class _FixedBottomNav extends StatelessWidget {
                       label,
                       style: TextStyle(
                         fontSize: 9,
-                        fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
+                        fontWeight: isActive
+                            ? FontWeight.w700
+                            : FontWeight.w400,
                         color: isActive
                             ? _klightBlue
                             : (isDarkMode ? _kDarkHint : _kHint),
@@ -640,7 +680,7 @@ class _FixedBottomNav extends StatelessWidget {
 
 class _Header extends StatelessWidget {
   final String name, scholarId, photoUrl, logoUrl, timeOfDay;
-  // final VoidCallback onAvatarTap;
+  final VoidCallback onAvatarTap;
   final bool isDarkMode;
 
   const _Header({
@@ -649,7 +689,7 @@ class _Header extends StatelessWidget {
     required this.photoUrl,
     required this.logoUrl,
     required this.timeOfDay,
-    // required this.onAvatarTap,
+    required this.onAvatarTap,
     required this.isDarkMode,
   });
 
@@ -716,7 +756,11 @@ class _Header extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.waving_hand_rounded, color: _kAmber, size: 18),
+                    Icon(
+                      _greetIcon(timeOfDay),
+                      color: isDarkMode ? _kDarkHint : _kHint,
+                      size: 14,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'Good $timeOfDay,',
@@ -748,11 +792,7 @@ class _Header extends StatelessWidget {
                     //     shape: BoxShape.circle,
                     //   ),
                     // ),
-                    Icon(
-                          Icons.school_rounded,
-                          color: _kBlue,
-                          size: 20,
-                        ),
+                    Icon(Icons.school_rounded, color: _kBlue, size: 20),
                     const SizedBox(width: 5),
                     Text(
                       ' $scholarId',
@@ -772,13 +812,27 @@ class _Header extends StatelessWidget {
                         color: isDarkMode ? _kDarkBlueSoft : _kBlueSoft,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        'Active',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: _kBlue,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              color: _kGreen,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            'Active',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: _kBlue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -788,7 +842,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           GestureDetector(
-            // onTap: onAvatarTap,
+            onTap: onAvatarTap,
             child: Container(
               width: 90,
               height: 90,
@@ -826,10 +880,14 @@ class _Header extends StatelessWidget {
       ),
     );
   }
+
+  IconData _greetIcon(String tod) {
+    if (tod == 'Morning') return Icons.wb_sunny_rounded;
+    if (tod == 'Afternoon') return Icons.wb_cloudy_rounded;
+    return Icons.nights_stay_rounded;
+  }
 }
-// ═══════════════════════════════════════════════════════════════════════════
-// MODERN STAT CARD - Dark Mode Support with 3 Decorative Circles
-// ═══════════════════════════════════════════════════════════════════════════
+
 // ═══════════════════════════════════════════════════════════════════════════
 // MODERN STAT CARD - With Particles, Stars & Dots
 // ═══════════════════════════════════════════════════════════════════════════

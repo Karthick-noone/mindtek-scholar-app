@@ -18,6 +18,7 @@ const _kNavy = Color(0xFF0F1F3D);
 const _kBlue = Color(0xFF2D5BE3);
 const _kBlueMid = Color(0xFF4B7BF5);
 const _kBlueSoft = Color(0xFFEEF2FF);
+const _kDarkBlueSoft = Color(0xFF1E3A5F);
 const _kBg = Color(0xFFF2F4F8);
 const _kBorder = Color(0xFFE2E8F0);
 const _kHint = Color(0xFF94A3B8);
@@ -596,11 +597,11 @@ class _NavBtn extends StatelessWidget {
   Widget build(BuildContext context) => IconButton(
     icon: Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
-      ),
+      // decoration: BoxDecoration(
+      //   color: Colors.white.withOpacity(0.15),
+      //   shape: BoxShape.circle,
+      //   border: Border.all(color: Colors.white.withOpacity(0.2)),
+      // ),
       child: Icon(icon, size: 16, color: Colors.white),
     ),
     onPressed: onTap,
@@ -817,7 +818,6 @@ Positioned(
     ),
   ),
 ),
-
 // Avatar overlapping curve (position unchanged)
 Positioned(
   bottom: 90,
@@ -830,18 +830,20 @@ Positioned(
     onUpload: onUpload,
     onDelete: onDelete,
     hasPhoto: image != null || url.isNotEmpty,
+    isDarkMode: isDark, // Add this line - pass the isDark parameter
   ),
 ),
    ],
     );
   }
 }
-
 class _BigAvatar extends StatelessWidget {
   final File? image;
   final String url;
   final bool isUploading, hasPhoto;
   final VoidCallback onTap, onUpload, onDelete;
+  final bool isDarkMode; // Add this parameter
+
   const _BigAvatar({
     required this.image,
     required this.url,
@@ -850,6 +852,7 @@ class _BigAvatar extends StatelessWidget {
     required this.onTap,
     required this.onUpload,
     required this.onDelete,
+    required this.isDarkMode, // Add this
   });
 
   @override
@@ -864,10 +867,10 @@ class _BigAvatar extends StatelessWidget {
         placeholder: (_, __) => const Center(
           child: CircularProgressIndicator(strokeWidth: 2, color: _kBlue),
         ),
-        errorWidget: (_, __, ___) => _placeholder(),
+        errorWidget: (_, __, ___) => _placeholder(isDarkMode), // Pass isDarkMode
       );
     } else {
-      child = _placeholder();
+      child = _placeholder(isDarkMode); // Pass isDarkMode
     }
 
     return GestureDetector(
@@ -879,7 +882,7 @@ class _BigAvatar extends StatelessWidget {
             height: 88,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 4),
+              border: Border.all(color: isDarkMode ? _kBlue : Colors.white, width: 2),
               boxShadow: [
                 BoxShadow(
                   color: _kBlue.withOpacity(0.3),
@@ -967,12 +970,15 @@ class _BigAvatar extends StatelessWidget {
     );
   }
 
-  Widget _placeholder() => Container(
-    color: _kBlueSoft,
-    child: const Icon(Icons.person_rounded, size: 40, color: _kBlue),
+  Widget _placeholder(bool isDarkMode) => Container(
+    color: isDarkMode ? _kDarkBlueSoft : _kBlueSoft,
+    child: Icon(
+      Icons.person_rounded, 
+      size: 40, 
+      color: isDarkMode ? Colors.white : _kBlue,
+    ),
   );
 }
-
 // ═══════════════════════════════════════════════════════════════════════════
 // SCHOLAR BADGE ROW — joined date + company
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1476,10 +1482,10 @@ class _WorkTile extends StatelessWidget {
     );
   }
 }
+// ═══════════════════════════════════════════════════════════════════════════
+// WORK DESCRIPTION - Full Width
+// ═══════════════════════════════════════════════════════════════════════════
 
-// ═══════════════════════════════════════════════════════════════════════════
-// WORK DESCRIPTION
-// ═══════════════════════════════════════════════════════════════════════════
 class _WorkDescBlock extends StatefulWidget {
   final String text;
   final bool isDark;
@@ -1494,6 +1500,7 @@ class _WorkDescBlockState extends State<_WorkDescBlock> {
   Widget build(BuildContext context) {
     final surface = widget.isDark ? _kDarkCard : Colors.white;
     return Container(
+      width: double.infinity, // Added full width
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: surface,
@@ -1542,7 +1549,6 @@ class _WorkDescBlockState extends State<_WorkDescBlock> {
     );
   }
 }
-
 // ═══════════════════════════════════════════════════════════════════════════
 // WORK PROGRESS — straight segmented bar style
 // ═══════════════════════════════════════════════════════════════════════════

@@ -9,6 +9,7 @@ class AuthProvider extends ChangeNotifier {
   
   bool _isLoading = false;
   bool _isAuthenticated = false;
+  bool _isInitialized = false;
   String? _errorMessage;
   String? _userName;
   String? _userEmail;
@@ -24,6 +25,7 @@ class AuthProvider extends ChangeNotifier {
   String? get userId => _userId;
   String? get scholarId => _scholarId;
   String? get changePasswordId => _idForChangePassword;
+  bool get isInitialized => _isInitialized;
   
   AuthProvider() {
     _checkAuthStatus();
@@ -90,7 +92,8 @@ Future<bool> login(String userId, String password, {bool rememberMe = false}) as
     } else {
       _isAuthenticated = false;
     }
-    
+    // Mark that the initial auth check has completed so UI can decide what to show
+    _isInitialized = true;
     notifyListeners();
   }
 
